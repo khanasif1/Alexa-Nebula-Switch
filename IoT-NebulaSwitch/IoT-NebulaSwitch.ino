@@ -32,6 +32,7 @@
 #include "WifiHelper.h"
 
 long apiCallInterval = 0;
+int ApiCallInterval=30000;
 char* host = "nebula-switch.azurewebsites.net";
 const int httpPort = 80;
 String url = "/api/getnebulaswitchstatus";
@@ -50,7 +51,7 @@ void setup() {
 }
 
 void loop() {
-  if(millis()- apiCallInterval>20000){
+  if(millis()- apiCallInterval > ApiCallInterval){
     /*Call API every 20sec, millis give time im millisec since board started*/
     digitalWrite(2, LOW);   // Turn the LED on by making the voltage LOW
     delay(1000);            // Wait for a second
