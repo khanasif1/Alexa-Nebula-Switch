@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "storage1": {
+      "restored": true,
+      "restoreTime": "2020-06-24T01:27:18.990974Z"
+    }
+  },
+  "parameters": {
+    "resourceGroup": {
+      "Type": "resourceGroup",
+      "Value": "IOTV2"
+    },
+    "subscriptionId": {
+      "Type": "subscription",
+      "Value": "0e13d228-ea1f-466b-a0d1-9ce3a6260963"
+    }
+  }
+}
