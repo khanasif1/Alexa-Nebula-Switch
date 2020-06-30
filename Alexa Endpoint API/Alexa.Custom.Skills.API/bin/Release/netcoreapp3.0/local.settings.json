@@ -1,8 +1,0 @@
-{
-    "IsEncrypted": false,
-  "Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "DBConnect": "Server=tcp:u4sp1p9h4v.database.windows.net,1433;Initial Catalog=IoTDb;Persist Security Info=False;User ID=IoTDb;Password=Redhat0!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=60;"
-  }
-}
