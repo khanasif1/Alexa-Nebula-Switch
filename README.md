@@ -1,6 +1,6 @@
 # Alexa Nebula Switch
 Nebula switch is a Alexa operated IoT switch to manage electrical applicances.
-<img class="alignnone size-full wp-image-4556" src="https://khanasif1.files.wordpress.com/2020/06/maxresdefault.jpg" alt="maxresdefault" width="1280" height="720" />
+<img class="alignnone size-full wp-image-4556" src="https://khanasif1.files.wordpress.com/2020/06/maxresdefault.jpg" alt="maxresdefault" width="600" height="320" />
 
 It's no more a matter of discussion that voice-enabled systems are future. In or to keep up in the game it's always good to understand the technology and try your hands on it.
 
