@@ -20,5 +20,5 @@ endpoint.</li>
 </li>
 </ul>
 </li>
-	<li><strong>getnebulaswitchstatus: </strong>This endpoint is used by the IoT device to get the updated status of the switch from DB. Details around IoT will be available in <del>Part 3 of the blog series</del></li>
+	<li><strong>getnebulaswitchstatus: </strong>This endpoint is used by the IoT device to get the updated status of the switch from DB.</li>
 </ul>
