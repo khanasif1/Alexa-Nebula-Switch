@@ -4,7 +4,7 @@
 #include <EthernetClient.h>
 #include <EthernetServer.h>
 #include <EthernetUdp.h>
-
+#include "oled.h"
 /*
  *  This sketch sends data via HTTP GET requests to data.sparkfun.com service.
  *
@@ -36,40 +36,58 @@ int ApiCallInterval=30000;
 char* host = "nebula-switch.azurewebsites.net";
 const int httpPort = 80;
 String url = "/api/getnebulaswitchstatus";
-
+int RelayPin =15;
+int switchState=0;
 
 void setup() {
   Serial.println("***********************Setup Begins*********************** ");
   Serial.begin(9600);
+  
+  pinMode(16,OUTPUT); 
+  pinMode(5,OUTPUT); 
+  pinMode(4,OUTPUT);  
+  
   delay(100);  
   Serial.println("***********************Connected Started*********************** ");
+  oled.DisplayMessage("Wifi Strat", 2, 0, 3);
   WifiHelper.Connect();        
+  oled.DisplayMessage("Wifi Connected", 2, 0, 3);
   delay(500); 
   Serial.println("***********************Connected to WiFi*********************** ");  
   pinMode(2, OUTPUT);
-  pinMode(13, OUTPUT); //Relay Switch Pin
+  pinMode(RelayPin, OUTPUT); //Relay Switch Pin
 }
 
 void loop() {
   if(millis()- apiCallInterval > ApiCallInterval){
+    oled.DisplayMessage("Start API Call", 2, 0, 3);
     /*Call API every 20sec, millis give time im millisec since board started*/
     digitalWrite(2, LOW);   // Turn the LED on by making the voltage LOW
     delay(1000);            // Wait for a second
     Serial.println("API Calling to get status");
     String switchState= HTTPRequestHelper();
-    if(switchState.toInt()==1){
+    switchState = switchState.toInt();
+    if(switchState.toInt()==1){      
+      oled.DisplayMessage("SWITCH ON", 2, 0, 3);
       Serial.println("Switch ON");
-      digitalWrite(13, LOW);       // sets the digital pin 13 ON
-    }else{
+      digitalWrite(RelayPin, LOW);       // sets the digital pin 13 ON
+    }else{      
+      oled.DisplayMessage("SWITCH OFF", 2, 0, 3);
       Serial.println("Switch OFF");
-      digitalWrite(13, HIGH);       // sets the digital pin 13 OFF 
+      digitalWrite(RelayPin, HIGH);       // sets the digital pin 13 OFF 
     }
     
     Serial.println("API Call end");    
     digitalWrite(2, HIGH);  // Turn the LED off by making the voltage HIGH
+   //oled.DisplayMessage("End API Call", 2, 0, 3);
     delay(2000);
     apiCallInterval=millis();
   }
+  /*if(switchState == 1){
+    oled.DisplayMessage("SWITCH ON", 1, 0, 3);
+    }else{
+      oled.DisplayMessage("SWITCH OFF", 1, 0, 3);
+    }*/
 }
 
 String HTTPRequestHelper(){
