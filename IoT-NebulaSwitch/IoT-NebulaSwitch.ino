@@ -39,7 +39,7 @@ String url = "/api/getnebulaswitchstatus";
 int RelayPin =12;
 bool RelayState=false;
 int switchState=0;
-
+bool firstRun=true;
 void setup() {
   oled.DisplayMessage("System Initialized", 2, 0, 3);
   Serial.println("***********************Setup Begins*********************** ");
@@ -56,7 +56,11 @@ void setup() {
 }
 
 void loop() {
-  oled.DisplayMessage("SWITCH OFF", 2, 0, 3);
+  if(firstRun == true){
+    Serial.println("In first run");
+    firstRun=false;
+    oled.DisplayMessage("SWITCH OFF", 2, 0, 3);
+  }
   if(millis()- apiCallInterval > ApiCallInterval){
     //oled.DisplayMessage("Start API Call", 2, 0, 3);
     /*Call API every 20sec, millis give time im millisec since board started*/
