@@ -30,4 +30,3 @@ void oledClass::DisplayMessage(String Message, int Size, int CurserX, int Curser
         display.display();
   }
 oledClass oled=oledClass();
-
