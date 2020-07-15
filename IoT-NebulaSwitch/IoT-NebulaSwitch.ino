@@ -33,9 +33,9 @@
 
 long apiCallInterval = 0;
 int ApiCallInterval=30000;
-char* host = "nebula-switch.azurewebsites.net";
+char* host = "nebulaswitch.azurewebsites.net";
 const int httpPort = 80;
-String url = "/api/getnebulaswitchstatus";
+String url = "/api/NebulaStatus/GetSwtichStatus";
 int RelayPin =12;
 bool RelayState=false;
 int switchState=0;
@@ -68,6 +68,7 @@ void loop() {
     delay(1000);            // Wait for a second
     Serial.println("API Calling to get status");
     String switchState= HTTPRequestHelper();
+    Serial.println("API Response"+switchState);
     switchState = switchState.toInt();
     if(switchState.toInt()==1){    
       Serial.println("Switch ON");
@@ -122,9 +123,10 @@ String HTTPRequestHelper(){
      Serial.println("Get Request executed");
       unsigned long timeout = millis();
       while (client.available() == 0) {
-        if (millis() - timeout > 10000) {
+        if (millis() - timeout > 60000) {
           Serial.println(">>> Client Timeout !");          
-          client.stop();        
+          client.stop(); 
+          break;       
         }
       }
       Serial.println("Reading HTTP Result");   
