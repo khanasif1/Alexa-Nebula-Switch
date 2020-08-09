@@ -32,7 +32,7 @@
 #include "WifiHelper.h"
 
 long apiCallInterval = 0;
-int ApiCallInterval=30000;
+int ApiCallInterval=30000;//Call API every minute
 char* host = "nebulaswitch.azurewebsites.net";
 const int httpPort = 80;
 String url = "/api/NebulaStatus/GetSwtichStatus";
@@ -40,6 +40,14 @@ int RelayPin =12;
 bool RelayState=false;
 int switchState=0;
 bool firstRun=true;
+
+int restartInterval=60*60*1000;//Restart every hour
+long restartTicker = 0;
+
+int wifiFailCnt=0;
+int wifiMaxRetry=5;
+long apiRetry=0;
+
 void setup() {
   oled.DisplayMessage("System Initialized", 2, 0, 3);
   Serial.println("***********************Setup Begins*********************** ");
@@ -67,34 +75,64 @@ void loop() {
     digitalWrite(2, LOW);   // Turn the LED on by making the voltage LOW
     delay(1000);            // Wait for a second
     Serial.println("API Calling to get status");
-    String switchState= HTTPRequestHelper();
-    Serial.println("API Response"+switchState);
-    switchState = switchState.toInt();
-    if(switchState.toInt()==1){    
-      Serial.println("Switch ON");
-      if(RelayState == false){  
-      oled.DisplayMessage("SWITCH ON", 2, 0, 3);      
-      digitalWrite(RelayPin, LOW);       // sets the digital pin 13 ON
-      RelayState=true;
-      }else{
-        Serial.println("Already on");             
+    String rawswitchState= HTTPRequestHelper();
+
+    rawswitchState.trim();
+    Serial.println("API Response : "+rawswitchState);
+    Serial.println("API Response length : "+rawswitchState.length());
+
+    if(rawswitchState.length()== 0){
+        apiRetry++;
+        while(apiRetry<2){            
+          delay(30000);     
+          Serial.println("In API Retry : "+apiRetry);   
+          String rawswitchState= HTTPRequestHelper();
+          rawswitchState.trim();
+          Serial.println("API Retry result length: ");
+          Serial.println(rawswitchState.length());
+          if(rawswitchState.length()!= 0){
+            break; 
+           }else{
+            Serial.println("API Retry count :"+apiRetry);
+            Serial.println(apiRetry);
+           }
+        }        
       }
-    }else{      
-      Serial.println("Switch OFF"); 
-      if(RelayState == true){  
-      oled.DisplayMessage("SWITCH OFF", 2, 0, 3);           
-      digitalWrite(RelayPin, HIGH);       // sets the digital pin 13 OFF 
-      RelayState = false;
-    }else{         
-      Serial.println("Already off");      
-    }
-   }
+    
+    if(rawswitchState.length()!= 0){
+        switchState = rawswitchState.toInt();
+        if(switchState == 1){           
+          Serial.println("Switch ON");
+          if(RelayState == false){  
+          oled.DisplayMessage("SWITCH ON", 2, 0, 3);      
+          digitalWrite(RelayPin, LOW);       // sets the digital pin 13 ON
+          RelayState=true;
+          }else{
+            Serial.println("Already on");             
+          }
+        }else if(switchState == 0){            
+          Serial.println("Switch OFF"); 
+          if(RelayState == true){  
+          oled.DisplayMessage("SWITCH OFF", 2, 0, 3);           
+          digitalWrite(RelayPin, HIGH);       // sets the digital pin 13 OFF 
+          RelayState = false;
+        }else{         
+          Serial.println("Already off");      
+        }
+       }else{
+          Serial.println("Some error at API side, should be good in next run"); 
+          RelayState == false;
+        }      
+    }else{
+      Serial.println("Some error at API side, should be good in next run"); 
+      digitalWrite(RelayPin, HIGH);//***********Remove***********
+      digitalWrite(RelayPin, LOW); //***********Remove***********  
+      }
     Serial.println("API Call end");    
     digitalWrite(2, HIGH);  // Turn the LED off by making the voltage HIGH
-   //oled.DisplayMessage("End API Call", 2, 0, 3);
-    delay(2000);
-    apiCallInterval=millis();
-  }
+   
+    apiCallInterval=millis(); 
+  }   
 }
 
 
@@ -105,11 +143,17 @@ String HTTPRequestHelper(){
   const int httpPort = 80;
   
   if (!client.connect(host, httpPort)) {
-    //DisplayMessage("connection to server failed");
+    wifiFailCnt++;
     Serial.println("connection to server failed");
+    if(wifiFailCnt>wifiMaxRetry){        
+     wifiFailCnt=0;
      WifiHelper.Connect();  
-    //return "";
-  }
+    }else{
+    return String(switchState);
+    }
+  }else{
+    Serial.println("connection to server success :)");
+    }
   Serial.println("Is Connected");
   
   String data="2";
@@ -123,17 +167,19 @@ String HTTPRequestHelper(){
      Serial.println("Get Request executed");
       unsigned long timeout = millis();
       while (client.available() == 0) {
-        if (millis() - timeout > 60000) {
+        if (millis() - timeout > 90000) {
           Serial.println(">>> Client Timeout !");          
           client.stop(); 
           break;       
         }
       }
       Serial.println("Reading HTTP Result");   
-      // Read all the lines of the reply from server and print them to Serial
-      while(client.available()){
+      // Read all the lines of the reply from server and print them to Serial        
+      while(client.available()){        
         jsonMessage = client.readStringUntil('\r');             
       }   
+     
       Serial.println("Response : "+jsonMessage);
+      wifiFailCnt=0; //Alway set wifi fail count to 0 if API call was success 
       return jsonMessage;
 }
