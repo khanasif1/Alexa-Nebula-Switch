@@ -146,13 +146,15 @@ String HTTPRequestHelper(){
     wifiFailCnt++;
     Serial.println("connection to server failed");
     if(wifiFailCnt>wifiMaxRetry){        
+     Serial.println("WiFi connection attempt exceeded max count. Starting Reconnect!!!");
      wifiFailCnt=0;
      WifiHelper.Connect();  
     }else{
+    Serial.println("WiFi reconnect time not met!!");
     return String(switchState);
     }
   }else{
-    Serial.println("connection to server success :)");
+    Serial.println("connection to server success :)`");
     }
   Serial.println("Is Connected");
   
